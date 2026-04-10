@@ -1,0 +1,50 @@
+
+## build it -> it creates sh2dwave_wrapper.cpp and sh2dwave_wrapper.cpython-312-darwin.so
+python setup.py build_ext --inplace
+
+
+## for macbook optional to verify and correction
+install_name_tool -delete_rpath /opt/anaconda3/lib sh2dwave_wrapper.cpython-*.so
+python -c "import sh2dwave_wrapper; print('OK')"
+
+
+## model input -> which creates Vs and rho input 2D model 
+## In model folder
+python build_model.py
+
+## Either npy file or txt file
+export VS_FILE=./model/vs_model.npy
+export RHO_FILE=./model/rho_model.npy
+or
+export VS_FILE=./model/vs_model.txt
+export RHO_FILE=./model/rho_model.txt
+
+
+## parameters 
+source para.sh
+
+## run for wave propagation
+export MODE=wave
+python main.py
+
+
+### run for seismogram
+export MODE=seis
+python main.py
+
+
+
+
+
+
+
+## Remove environment contamination and old generated files
+unset LDFLAGS
+unset CPPFLAGS
+unset CFLAGS
+unset CXXFLAGS
+unset LDSHARED
+
+rm -rf build
+rm -f sh2dwave_wrapper.cpp
+rm -f sh2dwave_wrapper.cpython-*.so
